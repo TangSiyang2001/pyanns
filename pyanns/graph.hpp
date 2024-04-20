@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
@@ -203,12 +204,14 @@ template <typename node_t> struct Graph {
         points[i].resize(nbr_size);
         in.read((char *)points[i].data(), nbr_size * sizeof(uint32_t));
     }
-    std::cout << "get K" << K << std::endl;
     data = (node_t *)align_alloc((int64_t)N * K * 4);
+    std::cout << "get K" << K << std::endl;
     memset(data, -1, (int64_t)N * K * 4);
+    std::cout << "start copy" << std::endl;
     for (int32_t i = 0; i < N; i++) {
-        memcpy(data + (i * K * 4), (char*)points[i].data(), points[i].size() * 4);
+        std::copy(points[i].begin(), points[i].end(), data + (i * K * 4));
     }
+    std::cout << "finish loading" << std::endl;
     in.close();
     // TODO: entry points
   }
