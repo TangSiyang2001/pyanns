@@ -180,12 +180,9 @@ template <typename node_t> struct Graph {
   void load_proj_graph(const std::string &filename) {
     static_assert(std::is_same_v<node_t, int32_t>);
     free(data);
-    std::cout << "loading graph from " << filename << std::endl;
     std::ifstream in(filename, std::ios::binary);
     eps.resize(1);
     in.read((char *)&eps[0], sizeof(uint32_t));
-    std::cout << "Projection graph, "
-              << "ep: " << projection_ep_ << std::endl;
     in.read((char *)&N, sizeof(uint32_t));
 
     // TODO: read K and data:
@@ -196,20 +193,18 @@ template <typename node_t> struct Graph {
 
     float out_degree = 0.0;
     K = 0;
-    for (uint32_t i = 0; i < N; i++) {
-        uint32_t nbr_size;
+    for (int32_t i = 0; i < N; i++) {
+        int32_t nbr_size;
         in.read((char *)&nbr_size, sizeof(nbr_size));
-        k = std::max(K, nbr_size);
+        K = std::max(K, nbr_size);
         out_degree += static_cast<float>(nbr_size);
         points[i].resize(nbr_size);
         in.read((char *)points[i].data(), N * sizeof(uint32_t));
     }
-    std::cout << "Projection graph, "
-              << "avg_degree: " << out_degree / npts << std::endl;
     data = (node_t *)align_alloc((int64_t)N * K * 4);
     memset(data, -1, (int64_t)N * K * 4);
     for (int32_t i = 0; i < N; i++) {
-        memcpy(data + (i * K * 4), (char*)points[i].data(), points[i].size() * 4)
+        memcpy(data + (i * K * 4), (char*)points[i].data(), points[i].size() * 4);
     }
     in.close();
     // TODO: entry points
