@@ -5,6 +5,7 @@
 #include <fstream>
 #include <memory>
 #include <vector>
+#include <iostream>
 
 #include "pyanns/hnsw/HNSWInitializer.hpp"
 #include "pyanns/memory.hpp"
@@ -191,6 +192,7 @@ template <typename node_t> struct Graph {
     std::vector<std::vector<int32_t>> points;
     points.resize(N);
 
+    std::cout << "get N:" << N << std::endl;
     float out_degree = 0.0;
     K = 0;
     for (int32_t i = 0; i < N; i++) {
@@ -199,8 +201,9 @@ template <typename node_t> struct Graph {
         K = std::max(K, nbr_size);
         out_degree += static_cast<float>(nbr_size);
         points[i].resize(nbr_size);
-        in.read((char *)points[i].data(), N * sizeof(uint32_t));
+        in.read((char *)points[i].data(), nbr_size * sizeof(uint32_t));
     }
+    std::cout << "get K" << K << std::endl;
     data = (node_t *)align_alloc((int64_t)N * K * 4);
     memset(data, -1, (int64_t)N * K * 4);
     for (int32_t i = 0; i < N; i++) {
